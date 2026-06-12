@@ -1,0 +1,84 @@
+plugins {
+  // Оставляем application
+  id 'application'
+  // Добавляем Spring Boot (версия 2.7.18 - последняя стабильная для Java 11)
+  id 'org.springframework.boot'
+  // Плагин для управления зависимостями Spring
+  id 'io.spring.dependency-management'
+}
+
+repositories {
+  mavenCentral()
+}
+
+java.sourceCompatibility = 11
+java.targetCompatibility = 11
+if (JavaVersion.current().isJava9Compatible()) {
+  compileJava.options.release.set(11)
+}
+
+// Указываем главный класс (точка входа)
+application.mainClass = 'com.ox.tictactoe.server.ServerLauncher'
+application.applicationName = appName
+eclipse.project.name = appName + '-server'
+
+dependencies {
+  implementation project(':shared')
+
+  // --- LIBGDX ЗАВИСИМОСТИ ---
+  // На сервере нам нужен Headless backend (без графики)
+  // gdxVersion берется из корневого gradle.properties
+  implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+  // --- SPRING BOOT ЗАВИСИМОСТИ ---
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+
+  implementation 'org.springframework.boot:spring-boot-starter-websocket:2.7.18'
+  implementation 'org.springframework.boot:spring-boot-starter:2.7.18'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+  // --- Jackson ---
+  implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
+  //implementation 'com.google.firebase:firebase-firestore:26.1.1'
+
+  // --- PostgreSQL ---
+  runtimeOnly 'org.postgresql:postgresql'
+  // Библиотека для удобной работы с JSON в базе данных
+  implementation 'com.vladmihalcea:hibernate-types-52:2.21.1'
+
+  // --- Шифратор паролей ---
+  implementation 'org.springframework.security:spring-security-crypto'
+
+
+  // Если нужны WebSockets:
+  // implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+  //Для тестов
+  //runtimeOnly 'com.h2database:h2'
+}
+
+// Настройка сборки Spring Boot JAR
+bootJar {
+  archiveBaseName.set(appName + "-server") // Имя файла на выходе
+  archiveVersion.set("1.0")
+  mainClass = application.mainClass
+
+  // Если нужно запускать этот jar как обычный исполняемый файл в Linux
+  launchScript()
+}
+
+// Задача jar нам не нужна в том виде, в каком она была в Liftoff,
+// так как bootJar делает всё лучше. Оставляем её пустой или базовой,
+// чтобы не ломать совместимость, если кто-то вызовет gradle jar.
+jar {
+  enabled = true
+  // Убираем сложную логику распаковки зависимостей (zipTree),
+  // так как Spring Boot упаковывает их внутрь BOOT-INF/lib
+}
+
+// Совместимость с gdx-setup (если используете команду dist)
+task dist(dependsOn: [bootJar]) {
+}
+
+

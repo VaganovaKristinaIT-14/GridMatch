@@ -1,0 +1,62 @@
+local.properties
+
+# Кэши сборки и временные файлы Gradle
+.gradle/
+build/
+*/build/
+
+gradlew
+gradlew.bat
+gradle/gradle-daemon-jvm.properties
+
+# IDE настройки
+.idea/
+.navigation/
+*.iml
+*.ipr
+*.iws
+out/
+
+# C++ / Native Build
+.cxx/
+.externalNativeBuild/
+
+# Готовые приложения и временные файлы компиляции
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# Texture packer cache (если используете)
+visui/assets/tpack.txt
+
+# Временные файлы VisUI / VisEditor (если используете редактор)
+*.bak
+*.tmp
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.DS_Store
+*~
+.fuse_hidden*
+.directory
+
+# Логи (включая серверные KryoNet, если запускаете локально)
+*.log
+hs_err_pid*
+
+# Игнорируем скомпилированные нативные библиотеки (они должны качаться через Gradle)
+# Примечание: Если вы ВРУЧНУЮ кладете .so файлы в jniLibs, закомментируйте строку ниже
+*.so
+*.dll
+*.dylib
+
+# Мы хотим видеть jar враппера, чтобы проект собирался у всех
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties

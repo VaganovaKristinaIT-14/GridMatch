@@ -1,0 +1,39 @@
+# ===========================
+# Автоматическая нормализация
+# Git сам решит: на Windows скачает CRLF, на Linux - LF.
+* text=auto
+
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Windows batch файлы всегда CRLF
+*.bat text eol=crlf
+
+# Указываем явно, чтобы Git не пытался искать в них текст и не портил их.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.psd binary
+
+# Шрифты (FreeType)
+*.ttf binary
+*.otf binary
+*.fnt binary
+
+# Звук
+*.mp3 binary
+*.wav binary
+*.ogg binary
+
+# Сжатые файлы и скины
+*.zip binary
+*.jar binary
+*.tar binary
+*.tar.gz binary
+*.atlas binary
+*.pack binary
+
+# VisUI и прочее
+*.json text

@@ -1,0 +1,52 @@
+name: Deploy Server
+on:
+  push:
+    branches: [ deploy_srv ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.HOST_PORT }}
+        timeout: 30m
+        command_timeout: 40m
+        script: |
+          cd ${{ secrets.PROJECT_PATH }}
+          #git fetch origin deploy-srv
+          #git checkout deploy-srv
+          #./gradlew :server:bootJar
+          #sudo systemctl restart ttt-server.service
+
+          # 1. Остановить пользовательский сервис
+          systemctl --user stop ttt-server.service
+          
+          # 2. Скачать последние изменения с Github
+          git fetch origin deploy_srv
+          
+          # 3. ЖЕСТКО сбросить локальный код до состояния на Github
+          git reset --hard origin/deploy_srv
+          
+          # 4. Удалить мусор и неотслеживаемые файлы
+          git clean -fd
+          
+          # 5. Удалить старые сборки
+          rm -rf server/build
+          
+          # 6. Собрать проект
+          chmod +x gradlew
+          rm -f gradle/gradle-daemon-jvm.properties
+          #./gradlew :server:bootJar 
+          ./gradlew :server:bootJar -x test --no-daemon -Dorg.gradle.jvmargs="-Xmx512m"
+          
+          # 7. Запустить пользовательский сервис
+          systemctl --user start ttt-server.service
+          
+          # 8. Проверить статус
+          systemctl --user status ttt-server.service --no-pager
